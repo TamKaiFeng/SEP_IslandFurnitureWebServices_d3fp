@@ -85,7 +85,6 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
         list2.add(list.get(0));
         return list;
     }
-    //Project START
 
     //this function is used by ECommerce_MemberLoginServlet
     @GET
