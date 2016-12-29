@@ -246,7 +246,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             e.printStackTrace();
             return "fail";
         }
-    }
+    } // send again
 
     @GET
     @Path("syncWithPOS")
