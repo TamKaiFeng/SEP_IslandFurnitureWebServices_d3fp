@@ -85,6 +85,65 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
         list2.add(list.get(0));
         return list;
     }
+    //Project START
+    @GET
+    @Path("getUserOverview")
+    @Produces("application/json")
+    public Memberentity getMember(@QueryParam("email") String email){
+            Memberentity m = new Memberentity();
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+            String stmt = "SELECT * FROM memberentity m WHERE m.isdeleted=FALSE AND m.EMAIL=?";
+            PreparedStatement ps = conn.prepareStatement(stmt);
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            String name = rs.getString("NAME");
+            if (rs.wasNull()){
+                name = "UNKNOWN";
+            }
+            m.setName(name);
+            String phone = "" + rs.getInt("PHONE");
+            if (rs.wasNull()){
+                phone = "UNKNOWN";
+            }
+            m.setPhone(phone);
+            String country = rs.getString("CITY");
+            if (rs.wasNull()){
+                country = "UNKNOWN";
+            }
+            m.setCity(country);
+            String address = rs.getString("ADDRESS");
+            if (rs.wasNull()){
+                address = "UNKNOWN";
+            }
+            m.setAddress(address);
+            String securityAns;
+            int securityQn = rs.getInt("SECURITYQUESTION");
+            if (rs.wasNull()){
+                securityQn = 0;
+                securityAns = "NO SECURITY QUESTION FOUND";
+            }
+            else{
+                securityAns = rs.getString("SECURITYANSWER");
+            }
+            m.setSecurityquestion(securityQn);
+            m.setSecurityanswer(securityAns);
+            int age = rs.getInt("AGE");
+            if (rs.wasNull()){
+                age = 0;
+            }
+            m.setAge(age);
+            int income = rs.getInt("INCOME");
+            if (rs.wasNull()){
+                income = 0;
+            }
+            m.setIncome(income);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+            return m;
+    }
 
     //this function is used by ECommerce_MemberLoginServlet
     @GET
@@ -187,7 +246,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             e.printStackTrace();
             return "fail";
         }
-    }
+    } // send again
 
     @GET
     @Path("syncWithPOS")
