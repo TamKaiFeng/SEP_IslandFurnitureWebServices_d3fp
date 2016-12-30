@@ -98,6 +98,10 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             rs.next();
+            Date dob = rs.getDate("DOB");
+            m.setDob(dob);
+            Double cumulativeSpending = rs.getDouble("CUMULATIVESPENDING");
+            m.setCumulativespending(cumulativeSpending);
             String name = rs.getString("NAME");
             if (rs.wasNull()){
                 name = "UNKNOWN";
@@ -145,6 +149,32 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             return m;
     }
 
+    
+    
+    @PUT
+    @Path("editMember")
+    public Response editMember (@QueryParam("member") Memberentity m){
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+            String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=? WHERE EMAIL=?";
+            PreparedStatement ps = conn.prepareStatement(stmt);
+            ps.setString(1,m.getName());
+            ps.setString(2,m.getPhone());
+            ps.setString(3,m.getCity());
+            ps.setString(4,m.getAddress());
+            ps.setString(5,m.getSecurityquestion().toString());
+            ps.setString(6,m.getSecurityanswer());
+            ps.setString(7,m.getAge().toString());
+            ps.setString(8,m.getIncome().toString());
+            ps.setString(9,m.getEmail());
+    }
+        catch(Exception ex){
+            ex.printStackTrace();
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+            return Response.status(Response.Status.CREATED).build();
+    }
+    //PROJECT END
     //this function is used by ECommerce_MemberLoginServlet
     @GET
     @Path("login")
