@@ -167,6 +167,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             ps.setString(7,m.getAge().toString());
             ps.setString(8,m.getIncome().toString());
             ps.setString(9,m.getEmail());
+            ps.executeQuery();
     }
         catch(Exception ex){
             ex.printStackTrace();
