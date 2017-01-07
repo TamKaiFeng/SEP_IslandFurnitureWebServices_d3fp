@@ -89,8 +89,8 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
     @GET
     @Path("getUserOverview")
     @Produces("application/json")
-    public Member getMember(@QueryParam("email") String email){
-            Member m = new Member();
+    public Memberentity getMember(@QueryParam("email") String email){
+            Memberentity m = new Memberentity();
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
             String stmt = "SELECT * FROM memberentity m WHERE m.isdeleted=FALSE AND m.EMAIL=?";
@@ -99,7 +99,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             ResultSet rs = ps.executeQuery();
             rs.next();
             Double cumulativeSpending = rs.getDouble("CUMULATIVESPENDING");
-            m.setCumulativeSpending(cumulativeSpending);
+            m.setCumulativespending(cumulativeSpending);
             String name = rs.getString("NAME");
             if (rs.wasNull()){
                 name = "UNKNOWN";
@@ -129,8 +129,8 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             else{
                 securityAns = rs.getString("SECURITYANSWER");
             }
-            m.setSecurityQuestion(securityQn);
-            m.setSecurityAnswer(securityAns);
+            m.setSecurityquestion(securityQn);
+            m.setSecurityanswer(securityAns);
             int age = rs.getInt("AGE");
             if (rs.wasNull()){
                 age = 0;
@@ -151,7 +151,8 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
     
     @PUT
     @Path("editMember")
-    public Response editMember (@QueryParam("member") Member m){
+    @Consumes("application/json")
+    public Response editMember (@QueryParam("member") Memberentity m){
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
             String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=? WHERE EMAIL=?";
@@ -160,8 +161,8 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             ps.setString(2,m.getPhone());
             ps.setString(3,m.getCity());
             ps.setString(4,m.getAddress());
-            ps.setString(5,m.getSecurityQuestion().toString());
-            ps.setString(6,m.getSecurityAnswer());
+            ps.setString(5,m.getSecurityquestion().toString());
+            ps.setString(6,m.getSecurityanswer());
             ps.setString(7,m.getAge().toString());
             ps.setString(8,m.getIncome().toString());
             ps.setString(9,m.getEmail());
