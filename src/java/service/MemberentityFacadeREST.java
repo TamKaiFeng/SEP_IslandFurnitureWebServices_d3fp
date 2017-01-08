@@ -40,6 +40,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.json.Json;
 import javax.json.JsonObject;
 import java.io.StringReader;
+import javax.ws.rs.FormParam;
 
 @Stateless
 @Path("entity.memberentity")
@@ -153,16 +154,19 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
 
     
     
-    @GET //Could not use PUT method due to the QueryParams returning null values
+    @PUT //Could not use PUT method due to the QueryParams returning null values
     @Path("editMember")
-    public Response editMember (@QueryParam("name") String name, 
-                                @QueryParam("phone") String phone,
-                                @QueryParam("country") String country, 
-                                @QueryParam("address") String address, @QueryParam("securityQuestion") int securityQuestion, 
-                                @QueryParam("securityAnswer") String securityAnswer, @QueryParam("age") int age, 
-                                @QueryParam("income") int income, 
-                                @QueryParam("email") String email, 
-                                @QueryParam("password") String password){
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response editMember (@FormParam("name") String name, 
+                                @FormParam("phone") String phone,
+                                @FormParam("country") String country, 
+                                @FormParam("address") String address, 
+                                @FormParam("securityQuestion") int securityQuestion, 
+                                @FormParam("securityAnswer") String securityAnswer, 
+                                @FormParam("age") int age, 
+                                @FormParam("income") int income, 
+                                @FormParam("email") String email, 
+                                @FormParam("password") String password){
         try {
             if(password.equals("")){
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
