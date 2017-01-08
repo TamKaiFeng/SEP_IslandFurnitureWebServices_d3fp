@@ -89,12 +89,13 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
         list2.add(list.get(0));
         return list;
     }
+
     //Project START
     @GET
     @Path("getUserOverview")
     @Produces("application/json")
-    public Memberentity getUserOverview(@QueryParam("email") String email){
-            Memberentity m = new Memberentity();
+    public Memberentity getUserOverview(@QueryParam("email") String email) {
+        Memberentity m = new Memberentity();
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
             String stmt = "SELECT * FROM memberentity m WHERE m.isdeleted=FALSE AND m.EMAIL=?";
@@ -105,98 +106,95 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             Double cumulativeSpending = rs.getDouble("CUMULATIVESPENDING");
             m.setCumulativespending(cumulativeSpending);
             String name = rs.getString("NAME");
-            if (rs.wasNull()){
+            if (rs.wasNull()) {
                 name = "UNKNOWN";
             }
             m.setName(name);
             String phone = "" + rs.getInt("PHONE");
-            if (rs.wasNull()){
+            if (rs.wasNull()) {
                 phone = "UNKNOWN";
             }
             m.setPhone(phone);
             String country = rs.getString("CITY");
-            if (rs.wasNull()){
+            if (rs.wasNull()) {
                 country = "UNKNOWN";
             }
             m.setCity(country);
             String address = rs.getString("ADDRESS");
-            if (rs.wasNull()){
+            if (rs.wasNull()) {
                 address = "UNKNOWN";
             }
             m.setAddress(address);
             String securityAns;
             int securityQn = rs.getInt("SECURITYQUESTION");
-            if (rs.wasNull()){
+            if (rs.wasNull()) {
                 securityQn = 0;
                 securityAns = "NO SECURITY QUESTION FOUND";
-            }
-            else{
+            } else {
                 securityAns = rs.getString("SECURITYANSWER");
             }
             m.setSecurityquestion(securityQn);
             m.setSecurityanswer(securityAns);
             int age = rs.getInt("AGE");
-            if (rs.wasNull()){
+            if (rs.wasNull()) {
                 age = 0;
             }
             m.setAge(age);
             int income = rs.getInt("INCOME");
-            if (rs.wasNull()){
+            if (rs.wasNull()) {
                 income = 0;
             }
             m.setIncome(income);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-            return m;
+        return m;
     }
 
-    
-    
     @PUT
     @Path("editMember")
-    public Response editMember (@QueryParam("name") String name, @QueryParam("phone") String phone,@QueryParam("country") String country, @QueryParam("address") String address, @QueryParam("securityQuestion") int securityQuestion, @QueryParam("securityAnswer") String securityAnswer, @QueryParam("age") int age, @QueryParam("income") int income, @QueryParam("email") String email, @QueryParam("password") String password){
+    public Response editMember(@QueryParam("name") String name, @QueryParam("phone") String phone, @QueryParam("country") String country, @QueryParam("address") String address, @QueryParam("securityQuestion") int securityQuestion, @QueryParam("securityAnswer") String securityAnswer, @QueryParam("age") int age, @QueryParam("income") int income, @QueryParam("email") String email, @QueryParam("password") String password) {
         try {
-            if(password.equals("")){
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
-            String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=? WHERE EMAIL=?";
-            PreparedStatement ps = conn.prepareStatement(stmt);
-            ps.setString(1,name);
-            ps.setString(2,phone);
-            ps.setString(3,country);
-            ps.setString(4,address);
-            ps.setInt(5,securityQuestion);
-            ps.setString(6,securityAnswer);
-            ps.setInt(7,age);
-            ps.setInt(8,income);
-            ps.setString(9,email);
-            ps.executeUpdate();
+            if (password.equals("")) {
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+                String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=? WHERE EMAIL=?";
+                PreparedStatement ps = conn.prepareStatement(stmt);
+                ps.setString(1, name);
+                ps.setString(2, phone);
+                ps.setString(3, country);
+                ps.setString(4, address);
+                ps.setInt(5, securityQuestion);
+                ps.setString(6, securityAnswer);
+                ps.setInt(7, age);
+                ps.setInt(8, income);
+                ps.setString(9, email);
+                ps.executeUpdate();
+            } else {
+                String passwordSalt = generatePasswordSalt();
+                String passwordHash = generatePasswordHash(passwordSalt, password);
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+                String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=?,PASSWORDHASH=?,PASSWORDSALT=? WHERE EMAIL=?";
+                PreparedStatement ps = conn.prepareStatement(stmt);
+                ps.setString(1, name);
+                ps.setString(2, phone);
+                ps.setString(3, country);
+                ps.setString(4, address);
+                ps.setInt(5, securityQuestion);
+                ps.setString(6, securityAnswer);
+                ps.setInt(7, age);
+                ps.setInt(8, income);
+                ps.setString(9, passwordHash);
+                ps.setString(10, passwordSalt);
+                ps.setString(11, email);
+                ps.executeUpdate();
             }
-            else{        
-            String passwordSalt = generatePasswordSalt();
-            String passwordHash = generatePasswordHash(passwordSalt, password);
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
-            String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=?,PASSWORDHASH=?,PASSWORDSALT=? WHERE EMAIL=?";
-            PreparedStatement ps = conn.prepareStatement(stmt);
-            ps.setString(1,name);
-            ps.setString(2,phone);
-            ps.setString(3,country);
-            ps.setString(4,address);
-            ps.setInt(5,securityQuestion);
-            ps.setString(6,securityAnswer);
-            ps.setInt(7,age);
-            ps.setInt(8,income);
-            ps.setString(9,passwordHash);
-            ps.setString(10,passwordSalt);
-            ps.setString(9,email);
-            ps.executeUpdate();
-    }       }
-        catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-            return Response.status(Response.Status.CREATED).build();
+        return Response.status(Response.Status.CREATED).build();
     }
+
     //PROJECT END
     //this function is used by ECommerce_MemberLoginServlet
     @GET
