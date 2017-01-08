@@ -175,7 +175,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             ps.setString(9,passwordHash);
             ps.setString(10,passwordSalt);
             ps.setString(11,m.getString("email"));
-            ps.executeQuery();
+            ps.executeUpdate();
             }
             else{
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
@@ -190,7 +190,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             ps.setString(7,m.getString("age"));
             ps.setString(8,m.getString("income"));
             ps.setString(9,m.getString("email"));
-            ps.executeQuery();
+            ps.executeUpdate();
     }       }
         catch(Exception ex){
             ex.printStackTrace();
