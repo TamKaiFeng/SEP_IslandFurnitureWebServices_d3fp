@@ -35,7 +35,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import javax.ws.rs.core.UriInfo;
+import javax.json.Json;
+import javax.json.JsonObject;
+import java.io.StringReader;
 
 @Stateless
 @Path("entity.memberentity")
@@ -89,7 +93,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
     @GET
     @Path("getUserOverview")
     @Produces("application/json")
-    public Memberentity getMember(@QueryParam("email") String email){
+    public Memberentity getUserOverview(@QueryParam("email") String email){
             Memberentity m = new Memberentity();
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
@@ -151,23 +155,43 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
     
     @PUT
     @Path("editMember")
-    @Consumes("application/json")
-    public Response editMember (@QueryParam("member") Memberentity m){
+    public Response editMember (@QueryParam("member") String memberJSON){
+        JsonObject m = Json.createReader(new StringReader(memberJSON)).readObject();
         try {
+            String passwordSalt = generatePasswordSalt();
+            String passwordHash = generatePasswordHash(passwordSalt, m.getString("password"));
+            if(m.getString("password").equals("")){
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+            String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=?,PASSWORDHASH=?,PASSWORDSALT=? WHERE EMAIL=?";
+            PreparedStatement ps = conn.prepareStatement(stmt);
+            ps.setString(1,m.getString("name"));
+            ps.setString(2,m.getString("phone"));
+            ps.setString(3,m.getString("country"));
+            ps.setString(4,m.getString("address"));
+            ps.setString(5,m.getString("securityQuestion"));
+            ps.setString(6,m.getString("securityAnswer"));
+            ps.setString(7,m.getString("age"));
+            ps.setString(8,m.getString("income"));
+            ps.setString(9,passwordHash);
+            ps.setString(10,passwordSalt);
+            ps.setString(11,m.getString("email"));
+            ps.executeQuery();
+            }
+            else{
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
             String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=? WHERE EMAIL=?";
             PreparedStatement ps = conn.prepareStatement(stmt);
-            ps.setString(1,m.getName());
-            ps.setString(2,m.getPhone());
-            ps.setString(3,m.getCity());
-            ps.setString(4,m.getAddress());
-            ps.setString(5,m.getSecurityquestion().toString());
-            ps.setString(6,m.getSecurityanswer());
-            ps.setString(7,m.getAge().toString());
-            ps.setString(8,m.getIncome().toString());
-            ps.setString(9,m.getEmail());
+            ps.setString(1,m.getString("name"));
+            ps.setString(2,m.getString("phone"));
+            ps.setString(3,m.getString("country"));
+            ps.setString(4,m.getString("address"));
+            ps.setString(5,m.getString("securityQuestion"));
+            ps.setString(6,m.getString("securityAnswer"));
+            ps.setString(7,m.getString("age"));
+            ps.setString(8,m.getString("income"));
+            ps.setString(9,m.getString("email"));
             ps.executeQuery();
-    }
+    }       }
         catch(Exception ex){
             ex.printStackTrace();
             return Response.status(Response.Status.NOT_FOUND).build();
