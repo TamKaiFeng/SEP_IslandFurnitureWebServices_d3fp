@@ -153,7 +153,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
 
     
     
-    @GET
+    @GET //Could not use PUT method due to the QueryParams returning null values
     @Path("editMember")
     public Response editMember (@QueryParam("name") String name, 
                                 @QueryParam("phone") String phone,
