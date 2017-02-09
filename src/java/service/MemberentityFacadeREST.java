@@ -152,8 +152,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             return m;
     }
 
-    
-    
+       
     @PUT //Could not use PUT method due to the QueryParams returning null values
     @Path("editMember")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
