@@ -106,6 +106,8 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
             Double cumulativeSpending = rs.getDouble("CUMULATIVESPENDING");
             m.setCumulativespending(cumulativeSpending);
             String name = rs.getString("NAME");
+            Long id = rs.getLong("ID");
+            m.setId(id);
             if (rs.wasNull()){
                 name = "UNKNOWN";
             }
@@ -153,59 +155,57 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
     }
 
        
-    @PUT //Could not use PUT method due to the QueryParams returning null values
+    @PUT
     @Path("editMember")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response editMember (@FormParam("name") String name, 
-                                @FormParam("phone") String phone,
-                                @FormParam("country") String country, 
-                                @FormParam("address") String address, 
-                                @FormParam("securityQuestion") int securityQuestion, 
-                                @FormParam("securityAnswer") String securityAnswer, 
-                                @FormParam("age") int age, 
-                                @FormParam("income") int income, 
-                                @FormParam("email") String email, 
-                                @FormParam("password") String password){
+    public Response editMember(@QueryParam("name") String name, 
+                               @QueryParam("phone") String phone, 
+                               @QueryParam("country") String country, 
+                               @QueryParam("address") String address, 
+                               @QueryParam("securityQuestion") int securityQuestion, 
+                               @QueryParam("securityAnswer") String securityAnswer, 
+                               @QueryParam("age") int age, 
+                               @QueryParam("income") int income, 
+                               @QueryParam("email") String email, 
+                               @QueryParam("password") String password) {
         try {
-            if(password.equals("")){
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
-            String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=? WHERE EMAIL=?";
-            PreparedStatement ps = conn.prepareStatement(stmt);
-            ps.setString(1,name);
-            ps.setString(2,phone);
-            ps.setString(3,country);
-            ps.setString(4,address);
-            ps.setInt(5,securityQuestion);
-            ps.setString(6,securityAnswer);
-            ps.setInt(7,age);
-            ps.setInt(8,income);
-            ps.setString(9,email);
-            ps.executeUpdate();
+            if (password.equals("")) {
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+                String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=? WHERE EMAIL=?";
+                PreparedStatement ps = conn.prepareStatement(stmt);
+                ps.setString(1, name);
+                ps.setString(2, phone);
+                ps.setString(3, country);
+                ps.setString(4, address);
+                ps.setInt(5, securityQuestion);
+                ps.setString(6, securityAnswer);
+                ps.setInt(7, age);
+                ps.setInt(8, income);
+                ps.setString(9, email);
+                ps.executeUpdate();
+            } else {
+                String passwordSalt = generatePasswordSalt();
+                String passwordHash = generatePasswordHash(passwordSalt, password);
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+                String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=?,PASSWORDHASH=?,PASSWORDSALT=? WHERE EMAIL=?";
+                PreparedStatement ps = conn.prepareStatement(stmt);
+                ps.setString(1, name);
+                ps.setString(2, phone);
+                ps.setString(3, country);
+                ps.setString(4, address);
+                ps.setInt(5, securityQuestion);
+                ps.setString(6, securityAnswer);
+                ps.setInt(7, age);
+                ps.setInt(8, income);
+                ps.setString(9, passwordHash);
+                ps.setString(10, passwordSalt);
+                ps.setString(11, email);
+                ps.executeUpdate();
             }
-            else{        
-            String passwordSalt = generatePasswordSalt();
-            String passwordHash = generatePasswordHash(passwordSalt, password);
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
-            String stmt = "UPDATE memberentity SET NAME=?,PHONE=?,CITY=?,ADDRESS=?,SECURITYQUESTION=?,SECURITYANSWER=?,AGE=?,INCOME=?,PASSWORDHASH=?,PASSWORDSALT=? WHERE EMAIL=?";
-            PreparedStatement ps = conn.prepareStatement(stmt);
-            ps.setString(1,name);
-            ps.setString(2,phone);
-            ps.setString(3,country);
-            ps.setString(4,address);
-            ps.setInt(5,securityQuestion);
-            ps.setString(6,securityAnswer);
-            ps.setInt(7,age);
-            ps.setInt(8,income);
-            ps.setString(9,passwordHash);
-            ps.setString(10,passwordSalt);
-            ps.setString(9,email);
-            ps.executeUpdate();
-    }       }
-        catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-            return Response.status(Response.Status.CREATED).build();
+        return Response.status(Response.Status.CREATED).build();
     }
     //PROJECT END
     //this function is used by ECommerce_MemberLoginServlet
